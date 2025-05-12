@@ -32,8 +32,7 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 yolo_model_paths = {
-    'yolo.pt': r'disease_best.pt',
-    'roboflow.pt': r'roboflow.pt',
+    'yolo.pt': r'disease_best.pt'
 }
 
 
