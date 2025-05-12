@@ -1,0 +1,2 @@
+- YoloV8
+- pyTorch 2.6

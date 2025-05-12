@@ -1,0 +1,11 @@
+
+flask==2.3.2 
+opencv-python==4.8.0.74
+numpy<2.0
+requests
+tensorflow==2.14.0
+ultralytics==8.0.210
+gunicorn==23.0.0
+Pillow>=9.0.0
+h5py>=3.0.0
+torch==2.6.0

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Prediction with YOLOv8 and Keras Models</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f7f9fc 0%, #e9ebf3 100%);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        h1 {
+            font-size: 2.8rem;
+            color: #4a90e2;
+            margin-bottom: 20px;
+        }
+        header {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        header img {
+            width: 100%;
+            max-width: 800px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            justify-items: center;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .form-container, .result-container, .how-to-use {
+            background-color: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .form-container:hover, .result-container:hover, .how-to-use:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+        select, input[type="file"], button {
+            margin-bottom: 20px;
+            padding: 12px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            width: 100%;
+        }
+        button {
+            background: linear-gradient(45deg, #4a90e2, #357abd);
+            color: white;
+            cursor: pointer;
+            border: none;
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background: linear-gradient(45deg, #357abd, #4a90e2);
+        }
+        h2, h3 {
+            color: #4a90e2;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        img {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #888;
+        }
+        .how-to-use {
+            display: {% if class_name %} none {% else %} block {% endif %}; /* ซ่อนถ้ามีผลการพยากรณ์ */
+        }
+        @media screen and (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* Add hover descriptions for model options */
+        select option[data-description] {
+            cursor: help;
+        }
+        select option[data-description]:hover:after {
+            content: attr(data-description);
+            position: absolute;
+            background: #4a90e2;
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body> 
+
+    <div class="container">
+        <div class="form-container">
+            <h1>การวิเคราะห์ข้อมูลด้วย Image Processing(YOLO)</h1>
+            <form action="{{ url_for('imgpred') }}" method="post" enctype="multipart/form-data">
+                <input type="file" name="image" required>
+                <label for="model">Choose a model:</label>
+                <select name="model" id="model">
+                    <option value="yolo.pt" data-description="YOLOv8: Real-time object detection">YOLOv8</option>
+                    <!-- <option value="roboflow.pt" data-description="Roboflow: Fine-tuned for specific datasets">Roboflow</option>
+                    <option value="keras" data-description="Keras: Custom deep learning model">Keras Model</option> -->
+                </select>
+                <button type="submit">Predict</button>
+            </form>
+        </div>
+
+        {% if class_name %}
+            <div class="result-container">
+                <h2>ผลการทำนาย</h2>
+                <h3>รูปภาพผลลัพธ์</h3>
+                <img src="{{ url_for('static', filename='uploads/' + image_path) }}" alt="Result Image">
+                <p>ความแม่นยำ : {{ percentage }}%</p>
+                <p>ระยะเวลาการทำงาน : {{ inference_time }} ms</p>
+                
+                {% if class_name in ['Bacterial Spot'] %}
+                
+                <h3>พบ Bacterial Spot:</h3>
+
+                <h2></h2>
+                <ul>
+                  <li><strong>อาการ</strong> xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</li>
+                </ul>
+                               
+                <h2>วิธ๊แก้ไข:</h2>
+                <ul>
+                  <li>xxxxxxxxxxxxxxxxx</li>
+                </ul>
+                
+                {% elif class_name in ['key1'] %}
+                <h3>xxxxxxxxxxxxxxxxxxxx:</h3>
+
+                <h3>พบ Key1:</h3>
+
+                <h2></h2>
+                <ul>
+                  <li><strong>อาการ</strong> xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</li>
+                </ul>
+                               
+                <h2>วิธ๊แก้ไข:</h2>
+                <ul>
+                  <li>xxxx
+
+                {% elif class_name in ['key2'] %}
+                <h3>xxxxxxxxxxxxxxxxxxxx:</h3>
+
+                <h3>พบKey2:</h3>
+
+                <h2></h2>
+                <ul>
+                  <li><strong>อาการ</strong> xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</li>
+                </ul>
+                               
+                <h2>วิธ๊แก้ไข:</h2>
+                <ul>
+                  <li>xxxx
+                
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <div class="how-to-use">
+            <h2>วิธีการใช้งานเครื่องมือนี้</h2>
+            <p>เครื่องมือนี้ช่วยให้คุณสามารถอัปโหลดภาพและรับผลการทำนายของวัตถุที่ใช้โมเดลต่าง ๆ ได้ตามขั้นตอนดังนี้:</p>
+            <ul>
+                <li>คลิกปุ่ม "เลือกไฟล์" เพื่ออัปโหลดภาพจากอุปกรณ์</li>
+                <li>เลือกโมเดลจากเมนูแบบดรอปดาวน์ที่ตรงกับความต้องการ</li>
+                <li>คลิกปุ่ม "Predict" เพื่อส่งภาพสำหรับการวิเคราะห์และทำนาย</li>
+                <li>ผลลัพธ์จะแสดงประเภทของวัตถุที่ทำนายได้พร้อมกับระดับความมั่นใจ รวมถึงข้อมูลรายละเอียดของวัตถุที่ทำนาย</li>
+            </ul>
+            <p>โปรดตรวจสอบให้แน่ใจว่าไฟล์ภาพของคุณอยู่ในรูปแบบที่รองรับ (เช่น JPG, PNG เป็นต้น) และมีขนาดไม่ใหญ่เกินไปเพื่อให้การประมวลผลทำงานได้อย่างมีประสิทธิภาพ</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 RMUTL AI Innovator. All rights reserved.</p>
+    </footer>
+</body>
+</html>
+
+<script>
+    // รับค่า class_name ที่ส่งมาจาก Flask
+    var predictedClass = "{{ class_name }}";
+    
+    // พิมพ์ค่า class_name ไปยัง console ของ browser
+    console.log("Predicted Class:", predictedClass);
+</script>
+<!--- Modify by Worawit Fankam-ai ,RMUTL -->
