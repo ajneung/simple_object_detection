@@ -20,7 +20,7 @@ from werkzeug.utils import secure_filename
 import os
 from PIL import Image
 import logging
-from my_keras_model import KerasModel
+# from my_keras_model import KerasModel
 import time
 import numpy as np
 import torch
@@ -32,26 +32,11 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 yolo_model_paths = {
-#    'label.pt': r'label.pt',
     'yolo.pt': r'disease_best.pt',
     'roboflow.pt': r'roboflow.pt',
 }
 
-# keras_model_path = "keras_model.h5"
-# labels_path = 'labels.txt'
-# keras_model = KerasModel(keras_model_path, labels_path)
 
-lemon_characteristics = {
-    'green-lemon': {
-        'description': 'Green lemons are not yet fully ripe and have a more acidic taste.',
-    },
-    'mid_ripe_lemon': {
-        'description': 'Mid-ripe lemons have started turning yellow, offering a balance of sourness and sweetness.',
-    },
-    'fully_ripe_lemon': {
-        'description': 'Fully ripe lemons are yellow and juicy, with the perfect amount of acidity.',
-    }
-}
 
 # Add the safe global to allow loading the DetectionModel class
 torch.serialization.add_safe_globals([DetectionModel])
@@ -85,14 +70,6 @@ def imgpred():
             model = YOLO(yolo_model_paths[model_name])
             logging.info(f"YOLO Model {model_name} loaded successfully.")
             class_name, percentage, characteristics, result_image_filename = predict_yolo(image_path, model)
-        # elif model_name == 'keras':
-        #     class_name, confidence = keras_model.predict(image_path)
-        #     percentage = confidence * 100
-        #     characteristics = lemon_characteristics.get(class_name, {'description': 'No information available'}) if class_name else {}
-        # elif model_name == 'teachable_machine':
-        #     class_name, confidence = predict_teachable_machine(image_path)
-        #     percentage = confidence * 100
-        #     characteristics = lemon_characteristics.get(class_name, {'description': 'No information available'}) if class_name else {}
         else:
             logging.error(f"Invalid model name selected: {model_name}")
             return redirect(url_for('home'))
@@ -127,7 +104,7 @@ def predict_yolo(image_path, model):
         if confidence > max_confidence:
             max_confidence = confidence
             max_class = cls_name
-    detected_characteristics = lemon_characteristics.get(max_class, {'description': 'No information available'}) if max_class else {}
+    detected_characteristics = max_class
     return max_class, round(max_confidence, 2), detected_characteristics, result_image_filename
 
 def predict_teachable_machine(image_path):
