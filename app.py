@@ -105,6 +105,8 @@ def predict_yolo(image_path, model):
             max_confidence = confidence
             max_class = cls_name
     detected_characteristics = max_class
+    if max_class is None:
+        max_class = "None"
     return max_class, round(max_confidence, 2), detected_characteristics, result_image_filename
 
 def predict_teachable_machine(image_path):
