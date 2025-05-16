@@ -108,11 +108,6 @@ def predict_yolo(image_path, model):
         max_class = "None"
     return max_class, round(max_confidence, 2), detected_characteristics, result_image_filename
 
-def predict_teachable_machine(image_path):
-    image = Image.open(image_path)
-    class_name = "fully_ripe_lemon"
-    confidence = 0.95
-    return class_name, confidence
 
 if __name__ == "__main__":
     app.run(debug=True)
